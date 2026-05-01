@@ -96,6 +96,10 @@ body.light-theme {
   background-image: none;
 }
 
+body.light-theme .glitter-particle {
+  mix-blend-mode: normal;
+}
+
 body.light-theme .glass-panel {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }

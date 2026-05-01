@@ -23,6 +23,15 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/comments', commentsRoutes);
 app.use('/api/users', usersRoutes);
 
+// --- PRODUCTION DEPLOYMENT SETUP ---
+// Serve frontend build files in production
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
