@@ -11,6 +11,8 @@ export default function TaskList({ session, isAdmin }) {
   const [filterPriority, setFilterPriority] = useState('All');
   const [activeCommentTask, setActiveCommentTask] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
   useEffect(() => {
     fetchTasks();
     
@@ -34,7 +36,7 @@ export default function TaskList({ session, isAdmin }) {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('/api/tasks', {
+      const response = await axios.get(`${API_URL}/api/tasks`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
       setTasks(response.data);
@@ -48,7 +50,7 @@ export default function TaskList({ session, isAdmin }) {
   const handleDelete = async (id) => {
     if (!confirm('Delete this task?')) return;
     try {
-      await axios.delete(`/api/tasks/${id}`, {
+      await axios.delete(`${API_URL}/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
     } catch (err) {
@@ -60,7 +62,7 @@ export default function TaskList({ session, isAdmin }) {
     const task = tasks.find(t => t.id === id);
     if (!task || task.status === newStatus) return;
     try {
-      await axios.put(`/api/tasks/${id}`, { ...task, status: newStatus }, {
+      await axios.put(`${API_URL}/api/tasks/${id}`, { ...task, status: newStatus }, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
       // Optimistic update

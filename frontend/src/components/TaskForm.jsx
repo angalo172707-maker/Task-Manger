@@ -12,9 +12,11 @@ export default function TaskForm({ onClose, onTaskCreated, session, isAdmin }) {
   const [loading, setLoading] = useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
 
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
   useEffect(() => {
     if (isAdmin) {
-      axios.get('/api/users', {
+      axios.get(`${API_URL}/api/users`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       })
       .then(res => setAvailableUsers(res.data))
@@ -27,7 +29,7 @@ export default function TaskForm({ onClose, onTaskCreated, session, isAdmin }) {
     setLoading(true);
     
     try {
-      const response = await axios.post('/api/tasks', {
+      const response = await axios.post(`${API_URL}/api/tasks`, {
         title,
         description,
         status,

@@ -7,13 +7,15 @@ export default function TaskComments({ task, onClose, session }) {
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
   useEffect(() => {
     fetchComments();
   }, [task.id]);
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(`/api/comments/${task.id}`, {
+      const res = await axios.get(`${API_URL}/api/comments/${task.id}`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
       setComments(res.data);
@@ -28,7 +30,7 @@ export default function TaskComments({ task, onClose, session }) {
     e.preventDefault();
     if (!newComment.trim()) return;
     try {
-      const res = await axios.post(`/api/comments/${task.id}`, { content: newComment }, {
+      const res = await axios.post(`${API_URL}/api/comments/${task.id}`, { content: newComment }, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
       setComments([...comments, res.data]);
