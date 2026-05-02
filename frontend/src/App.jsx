@@ -7,11 +7,13 @@ import TaskForm from './components/TaskForm';
 import GlitterTrail from './components/GlitterTrail';
 import Footer from './components/Footer';
 import Chat from './components/Chat';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   const [session, setSession] = useState(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
 
   const isAdmin = session?.user?.email === import.meta.env.VITE_ADMIN_EMAIL;
@@ -33,7 +35,12 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      if (_event === 'PASSWORD_RECOVERY') {
+        setIsResettingPassword(true);
+      } else {
+        setIsResettingPassword(false);
+        setSession(session);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -42,6 +49,10 @@ function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+  if (isResettingPassword) {
+    return <ResetPassword onDone={() => { setIsResettingPassword(false); supabase.auth.signOut(); }} />;
+  }
 
   if (!session) {
     return <Auth onAuthSuccess={setSession} />;

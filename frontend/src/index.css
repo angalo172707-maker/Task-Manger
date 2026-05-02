@@ -366,3 +366,109 @@ body.light-theme .loader {
   margin-top: 1.5rem;
   justify-content: flex-end;
 }
+
+/* Auth Social Buttons */
+.auth-social-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--neon-blue);
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--text-primary);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  letter-spacing: 0.3px;
+}
+
+.auth-social-btn:hover:not(:disabled) {
+  background: rgba(0, 240, 255, 0.18);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+  transform: translateY(-2px);
+  color: var(--neon-blue);
+}
+
+.auth-social-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-social-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-ghost-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  letter-spacing: 0.3px;
+}
+
+.auth-ghost-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.auth-ghost-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-ghost-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Blob animations for auth background */
+@keyframes blob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes blob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-50px, 30px) scale(1.05); }
+  66% { transform: translate(20px, -40px) scale(0.9); }
+}
+
+/* Light theme overrides for auth buttons */
+body.light-theme .auth-social-btn {
+  background: rgba(0, 102, 255, 0.08);
+  border-color: var(--neon-blue);
+}
+
+body.light-theme .auth-social-btn:hover:not(:disabled) {
+  background: rgba(0, 102, 255, 0.15);
+}
+
+body.light-theme .auth-ghost-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: var(--text-secondary);
+}
+
+body.light-theme .auth-ghost-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.07);
+  border-color: rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
+}

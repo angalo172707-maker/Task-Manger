@@ -14,18 +14,21 @@ export default function Chat({ session, onClose }) {
   const API_URL = import.meta.env.VITE_API_URL || '';
   const currentUserId = session?.user?.id;
   const currentUserEmail = session?.user?.email;
+  const GUEST_EMAIL = 'guest.taskmanager.demo@gmail.com';
+  const isGuest = currentUserEmail === GUEST_EMAIL;
 
   useEffect(() => {
-    // Fetch all users to chat with
+    // Guests cannot see user list — only global chat
+    if (isGuest) return;
     axios.get(`${API_URL}/api/users/public`, {
       headers: { Authorization: `Bearer ${session.access_token}` }
     })
     .then(res => {
-      // Exclude self
-      setUsers(res.data.filter(u => u.id !== currentUserId));
+      // Exclude self and the guest account
+      setUsers(res.data.filter(u => u.id !== currentUserId && u.email !== GUEST_EMAIL));
     })
     .catch(err => console.error('Failed to load users for chat:', err));
-  }, [session.access_token, API_URL, currentUserId]);
+  }, [session.access_token, API_URL, currentUserId, isGuest]);
 
   useEffect(() => {
     fetchMessages();
@@ -133,57 +136,59 @@ export default function Chat({ session, onClose }) {
       </div>
 
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Sidebar */}
-        <div style={{
-          width: '120px',
-          borderRight: '1px solid var(--border-color)',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'rgba(0,0,0,0.1)'
-        }}>
-          <button 
-            onClick={() => setSelectedUser(null)}
-            style={{
-              padding: '0.75rem 0.5rem',
-              background: selectedUser === null ? 'var(--neon-blue-transparent)' : 'transparent',
-              border: 'none',
-              borderBottom: '1px solid var(--border-color)',
-              color: selectedUser === null ? 'var(--neon-blue)' : 'var(--text-primary)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontSize: '0.85rem',
-              fontWeight: selectedUser === null ? 600 : 400
-            }}
-          >
-            # Global
-          </button>
-          
-          <div style={{ overflowY: 'auto', flex: 1 }}>
-            {users.map(u => (
-              <button 
-                key={u.id}
-                onClick={() => setSelectedUser(u)}
-                style={{
-                  padding: '0.75rem 0.5rem',
-                  background: selectedUser?.id === u.id ? 'var(--neon-purple-transparent)' : 'transparent',
-                  border: 'none',
-                  borderBottom: '1px solid var(--border-color)',
-                  color: selectedUser?.id === u.id ? 'var(--neon-purple)' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  width: '100%',
-                  fontSize: '0.8rem',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}
-                title={u.email}
-              >
-                {u.email.split('@')[0]}
-              </button>
-            ))}
+        {/* Sidebar — hidden for guest users */}
+        {!isGuest && (
+          <div style={{
+            width: '120px',
+            borderRight: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'rgba(0,0,0,0.1)'
+          }}>
+            <button 
+              onClick={() => setSelectedUser(null)}
+              style={{
+                padding: '0.75rem 0.5rem',
+                background: selectedUser === null ? 'var(--neon-blue-transparent)' : 'transparent',
+                border: 'none',
+                borderBottom: '1px solid var(--border-color)',
+                color: selectedUser === null ? 'var(--neon-blue)' : 'var(--text-primary)',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontSize: '0.85rem',
+                fontWeight: selectedUser === null ? 600 : 400
+              }}
+            >
+              # Global
+            </button>
+            
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              {users.map(u => (
+                <button 
+                  key={u.id}
+                  onClick={() => setSelectedUser(u)}
+                  style={{
+                    padding: '0.75rem 0.5rem',
+                    background: selectedUser?.id === u.id ? 'var(--neon-purple-transparent)' : 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--border-color)',
+                    color: selectedUser?.id === u.id ? 'var(--neon-purple)' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    width: '100%',
+                    fontSize: '0.8rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}
+                  title={u.email}
+                >
+                  {u.email.split('@')[0]}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Chat Area */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -217,7 +222,10 @@ export default function Chat({ session, onClose }) {
                   }}>
                     {!isMe && selectedUser === null && (
                       <div style={{ fontSize: '0.7rem', color: 'var(--neon-purple)', marginBottom: '0.2rem', fontWeight: 600 }}>
-                        {msg.sender_email.split('@')[0]}
+                        {isGuest
+                          ? `User #${msg.sender_id.slice(0, 4).toUpperCase()}`
+                          : msg.sender_email.split('@')[0]
+                        }
                       </div>
                     )}
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', wordBreak: 'break-word' }}>
