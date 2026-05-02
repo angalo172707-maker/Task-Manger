@@ -209,6 +209,7 @@ export default function Auth({ onAuthSuccess }) {
         </div>
 
       ) : (
+        <div className="glass-panel auth-card" style={{ position: 'relative', zIndex: 1 }}>
         {/* Logo/Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{
