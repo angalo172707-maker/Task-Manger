@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { LogOut, LayoutDashboard, Plus, Shield, Sun, Moon } from 'lucide-react';
+import { LogOut, LayoutDashboard, Plus, Shield, Sun, Moon, MessageSquare } from 'lucide-react';
 
-export default function Navbar({ session, onLogout, onNewTask, theme, toggleTheme }) {
+export default function Navbar({ session, onLogout, onNewTask, onToggleChat, theme, toggleTheme }) {
   const email = session?.user?.email;
   const isAdmin = email === import.meta.env.VITE_ADMIN_EMAIL;
 
@@ -27,6 +27,15 @@ export default function Navbar({ session, onLogout, onNewTask, theme, toggleThem
         <button className="btn btn-primary" onClick={onNewTask}>
           <Plus size={16} />
           New Task
+        </button>
+
+        <button className="btn btn-secondary" onClick={onToggleChat} style={{
+          display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem',
+          background: 'rgba(0, 240, 255, 0.1)', border: '1px solid var(--neon-blue)',
+          color: 'var(--neon-blue)', borderRadius: '8px', cursor: 'pointer'
+        }}>
+          <MessageSquare size={16} />
+          Chat
         </button>
         
         <button className="btn btn-danger" onClick={onLogout}>

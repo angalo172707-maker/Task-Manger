@@ -6,10 +6,12 @@ import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import GlitterTrail from './components/GlitterTrail';
 import Footer from './components/Footer';
+import Chat from './components/Chat';
 
 function App() {
   const [session, setSession] = useState(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
 
   const isAdmin = session?.user?.email === import.meta.env.VITE_ADMIN_EMAIL;
@@ -52,6 +54,7 @@ function App() {
         session={session} 
         onLogout={handleLogout} 
         onNewTask={() => setShowTaskForm(true)} 
+        onToggleChat={() => setShowChat(!showChat)}
         theme={theme}
         toggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       />
@@ -72,6 +75,10 @@ function App() {
             // The TaskList will automatically refresh via realtime subscription
           }} 
         />
+      )}
+
+      {showChat && (
+        <Chat session={session} onClose={() => setShowChat(false)} />
       )}
     </div>
   );

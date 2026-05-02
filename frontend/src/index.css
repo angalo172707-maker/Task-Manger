@@ -9,7 +9,9 @@
   
   /* Rainbow Gradients & Neon Accents */
   --neon-blue: #00f0ff;
+  --neon-blue-transparent: rgba(0, 240, 255, 0.15);
   --neon-purple: #8a2be2;
+  --neon-purple-transparent: rgba(138, 43, 226, 0.15);
   --neon-pink: #ff007f;
   
   --primary-gradient: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));

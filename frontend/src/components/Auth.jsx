@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus, Github } from 'lucide-react';
 
 export default function Auth({ onAuthSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -32,6 +32,50 @@ export default function Auth({ onAuthSuccess }) {
     } catch (err) {
       setError(err.message);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const email = 'guest@taskmanager.local';
+      const password = 'guest1234Secure!';
+
+      // Try to sign in first
+      let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        // If it fails (likely because it doesn't exist), try signing up
+        const signUpResult = await supabase.auth.signUp({ email, password });
+        if (signUpResult.error) throw signUpResult.error;
+        data = signUpResult.data;
+      }
+
+      if (data?.session) {
+        onAuthSuccess(data.session);
+      } else {
+        setError('Guest login requires email confirmation to be disabled in Supabase, or the account needs to be verified.');
+      }
+    } catch (err) {
+      setError('Guest login failed: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+      });
+      if (error) throw error;
+      // The page will redirect to GitHub, so we don't handle onAuthSuccess here.
+    } catch (err) {
+      setError('GitHub login failed: ' + err.message);
       setLoading(false);
     }
   };
@@ -78,7 +122,7 @@ export default function Auth({ onAuthSuccess }) {
           <button 
             type="submit" 
             className="btn btn-primary" 
-            style={{ width: '100%', padding: '0.75rem' }}
+            style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem' }}
             disabled={loading}
           >
             {loading ? (
@@ -89,6 +133,26 @@ export default function Auth({ onAuthSuccess }) {
                 {isLogin ? 'Sign In' : 'Sign Up'}
               </>
             )}
+          </button>
+
+          <button 
+            type="button" 
+            className="btn btn-secondary" 
+            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', marginBottom: '0.75rem' }}
+            disabled={loading}
+            onClick={handleGithubLogin}
+          >
+            {loading ? <div className="loader"></div> : <><Github size={18} /> Continue with GitHub</>}
+          </button>
+
+          <button 
+            type="button" 
+            className="btn btn-secondary" 
+            style={{ width: '100%', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)' }}
+            disabled={loading}
+            onClick={handleGuestLogin}
+          >
+            {loading ? <div className="loader"></div> : 'Continue as Guest'}
           </button>
         </form>
 
