@@ -46,7 +46,11 @@ export default function TaskForm({ onClose, onTaskCreated, session, isAdmin }) {
       onClose();
     } catch (err) {
       console.error('Failed to create task:', err);
-      const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message;
+      const rawError = err.response?.data?.error || err.response?.data?.message || err.message;
+      // If the error is an object (e.g. Supabase error), extract its message
+      const errorMsg = typeof rawError === 'object' && rawError !== null
+        ? (rawError.message || JSON.stringify(rawError))
+        : rawError;
       alert(`Error: ${errorMsg}. (Make sure you ran the database.sql script!)`);
     } finally {
       setLoading(false);
