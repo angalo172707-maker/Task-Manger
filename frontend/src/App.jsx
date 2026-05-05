@@ -11,6 +11,7 @@ import ResetPassword from './components/ResetPassword';
 
 function App() {
   const [session, setSession] = useState(null);
+  const [initializing, setInitializing] = useState(true);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
@@ -30,6 +31,7 @@ function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setInitializing(false);
     });
 
     const {
@@ -41,6 +43,7 @@ function App() {
         setIsResettingPassword(false);
         setSession(session);
       }
+      setInitializing(false);
     });
 
     return () => subscription.unsubscribe();
@@ -49,6 +52,23 @@ function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+  if (initializing) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        background: 'var(--bg-color)',
+        gap: '1.5rem'
+      }}>
+        <div className="loader" style={{ width: '48px', height: '48px', borderWidth: '4px' }}></div>
+        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 500, letterSpacing: '1px' }}>INITIALIZING...</div>
+      </div>
+    );
+  }
 
   if (isResettingPassword) {
     return <ResetPassword onDone={() => { setIsResettingPassword(false); supabase.auth.signOut(); }} />;
@@ -59,7 +79,7 @@ function App() {
   }
 
   return (
-    <div className="app-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="app-container animate-fade-in" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <GlitterTrail />
       <Navbar 
         session={session} 

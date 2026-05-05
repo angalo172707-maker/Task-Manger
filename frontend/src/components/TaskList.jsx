@@ -88,8 +88,6 @@ export default function TaskList({ session, isAdmin }) {
     }
   };
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="loader"></div></div>;
-
   const filteredTasks = tasks.filter(t => {
     const matchesSearch = t.title.toLowerCase().includes(search.toLowerCase()) || (t.description || '').toLowerCase().includes(search.toLowerCase());
     const matchesPriority = filterPriority === 'All' || t.priority === filterPriority;
@@ -99,7 +97,7 @@ export default function TaskList({ session, isAdmin }) {
   const columns = ['To Do', 'In Progress', 'Done'];
 
   return (
-    <div>
+    <div className="animate-fade-in">
       {/* Search and Filters */}
       <div style={{display:'flex', gap:'1rem', marginBottom:'2rem', flexWrap:'wrap'}}>
         <input 
@@ -124,70 +122,77 @@ export default function TaskList({ session, isAdmin }) {
           <div 
             key={status} 
             className="glass-panel" 
-            style={{ padding: '1rem', minHeight: '60vh', display:'flex', flexDirection:'column' }}
+            style={{ padding: '1.25rem', minHeight: '70vh', display:'flex', flexDirection:'column' }}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, status)}
           >
-            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem', fontWeight: 600, display: 'flex', justifyContent: 'space-between' }}>
+            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.25rem', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               {status} 
-              <span className="status-badge" style={{background: 'rgba(255,255,255,0.1)'}}>
-                {filteredTasks.filter(t => t.status === status).length}
+              <span className="status-badge" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)'}}>
+                {loading ? '...' : filteredTasks.filter(t => t.status === status).length}
               </span>
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flexGrow: 1 }}>
-              {filteredTasks.filter(t => t.status === status).map(task => {
-                const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'Done';
-                
-                return (
-                  <div 
-                    key={task.id} 
-                    className="task-card glass-panel" 
-                    style={{ 
-                      cursor: 'grab', 
-                      padding: '1.25rem',
-                      borderLeft: `4px solid ${task.priority === 'High' ? 'var(--danger-color)' : task.priority === 'Medium' ? '#f5a623' : '#7ed321'}`,
-                      borderColor: isOverdue ? 'var(--danger-color)' : ''
-                    }}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, task.id)}
-                  >
-                    <div className="task-header">
-                      <h4 className="task-title" style={{fontSize: '1rem'}}>{task.title}</h4>
-                      <button className="btn-ghost" style={{padding:'0.25rem'}} onClick={() => handleDelete(task.id)}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                    
-                    <p className="task-desc" style={{fontSize: '0.85rem', marginBottom: '1rem'}}>{task.description}</p>
-                    
-                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'auto', borderTop:'1px solid var(--border-color)', paddingTop:'0.75rem', flexWrap:'wrap', gap:'0.5rem'}}>
-                      {task.due_date && (
-                        <div style={{
-                          fontSize: '0.75rem', 
-                          display:'flex', 
-                          alignItems:'center', 
-                          gap:'0.25rem', 
-                          color: isOverdue ? 'var(--danger-color)' : 'var(--text-primary)',
-                          fontWeight: isOverdue ? 'bold' : 'normal'
-                        }}>
-                          <Clock size={12} /> {new Date(task.due_date).toLocaleDateString()} {isOverdue && '(Overdue)'}
+              {loading ? (
+                // Skeleton Cards
+                [1, 2, 3].map(i => (
+                  <div key={i} className="glass-panel skeleton-card skeleton" style={{ opacity: 0.5 }}></div>
+                ))
+              ) : (
+                filteredTasks.filter(t => t.status === status).map(task => {
+                  const isOverdue = task.due_date && new Date(task.due_date) < new Date() && task.status !== 'Done';
+                  
+                  return (
+                    <div 
+                      key={task.id} 
+                      className="task-card glass-panel animate-fade-in" 
+                      style={{ 
+                        cursor: 'grab', 
+                        padding: '1.25rem',
+                        borderLeft: `4px solid ${task.priority === 'High' ? 'var(--danger-color)' : task.priority === 'Medium' ? '#f5a623' : '#7ed321'}`,
+                        borderColor: isOverdue ? 'var(--danger-color)' : ''
+                      }}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, task.id)}
+                    >
+                      <div className="task-header">
+                        <h4 className="task-title" style={{fontSize: '1rem'}}>{task.title}</h4>
+                        <button className="btn-ghost" style={{padding:'0.25rem'}} onClick={() => handleDelete(task.id)}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      
+                      <p className="task-desc" style={{fontSize: '0.85rem', marginBottom: '1rem'}}>{task.description}</p>
+                      
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'auto', borderTop:'1px solid var(--border-color)', paddingTop:'0.75rem', flexWrap:'wrap', gap:'0.5rem'}}>
+                        {task.due_date && (
+                          <div style={{
+                            fontSize: '0.75rem', 
+                            display:'flex', 
+                            alignItems:'center', 
+                            gap:'0.25rem', 
+                            color: isOverdue ? 'var(--danger-color)' : 'var(--text-primary)',
+                            fontWeight: isOverdue ? 'bold' : 'normal'
+                          }}>
+                            <Clock size={12} /> {new Date(task.due_date).toLocaleDateString()} {isOverdue && '(Overdue)'}
+                          </div>
+                        )}
+                        
+                        <button className="btn-ghost" style={{padding:'0.25rem', display:'flex', alignItems:'center', gap:'0.25rem', fontSize:'0.75rem'}} onClick={() => setActiveCommentTask(task)}>
+                          <MessageCircle size={14} /> Comments
+                        </button>
+                      </div>
+
+                      {isAdmin && task.assigned_to && (
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop:'0.5rem', display:'flex', alignItems:'center', gap:'0.25rem' }}>
+                          <ShieldAlert size={12} /> {task.assigned_to}
                         </div>
                       )}
-                      
-                      <button className="btn-ghost" style={{padding:'0.25rem', display:'flex', alignItems:'center', gap:'0.25rem', fontSize:'0.75rem'}} onClick={() => setActiveCommentTask(task)}>
-                        <MessageCircle size={14} /> Comments
-                      </button>
                     </div>
-
-                    {isAdmin && task.assigned_to && (
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop:'0.5rem', display:'flex', alignItems:'center', gap:'0.25rem' }}>
-                        <ShieldAlert size={12} /> {task.assigned_to}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
+                  )
+                })
+              )}
             </div>
           </div>
         ))}
